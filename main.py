@@ -1,20 +1,34 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from setupFile import Ui_MainWindow2
+from MainApp import Ui_MainWindow3
+
 
 
 class Ui_MainWindow(object):
+    def openSetup(self):
+        self.window1 = QtWidgets.QMainWindow()
+        self.ui1 = Ui_MainWindow2()
+        self.ui1.setupUi(self.window1)
+        self.window1.show()
+
+    def openMainApp(self):
+        self.window3 = QtWidgets.QMainWindow
+        self.ui3 = Ui_MainWindow3()
+        self.ui3.setupUi(self.window3)
+        self.window3.show()
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(725, 540)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.fileNew = QtWidgets.QPushButton(self.centralwidget)
+        self.fileNew = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.openSetup())
         self.fileNew.setGeometry(QtCore.QRect(30, 410, 151, 51))
         font = QtGui.QFont()
         font.setFamily("White Rabbit")
         font.setPointSize(11)
         self.fileNew.setFont(font)
         self.fileNew.setObjectName("fileNew")
-        self.openFile = QtWidgets.QPushButton(self.centralwidget)
+        self.openFile = QtWidgets.QPushButton(self.centralwidget, clicked = lambda: self.openMainApp())
         self.openFile.setGeometry(QtCore.QRect(210, 410, 151, 51))
         font = QtGui.QFont()
         font.setFamily("White Rabbit")
@@ -28,13 +42,6 @@ class Ui_MainWindow(object):
         font.setPointSize(11)
         self.settings.setFont(font)
         self.settings.setObjectName("settings")
-        self.openRecent = QtWidgets.QPushButton(self.centralwidget)
-        self.openRecent.setGeometry(QtCore.QRect(390, 410, 151, 51))
-        font = QtGui.QFont()
-        font.setFamily("White Rabbit")
-        font.setPointSize(11)
-        self.openRecent.setFont(font)
-        self.openRecent.setObjectName("openRecent")
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.gridLayoutWidget.setGeometry(QtCore.QRect(30, 10, 661, 381))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
@@ -62,8 +69,6 @@ class Ui_MainWindow(object):
         self.actionNew.setObjectName("actionNew")
         self.actionOpen = QtWidgets.QAction(MainWindow)
         self.actionOpen.setObjectName("actionOpen")
-        self.actionOpen_Recent = QtWidgets.QAction(MainWindow)
-        self.actionOpen_Recent.setObjectName("actionOpen_Recent")
         self.actionExit = QtWidgets.QAction(MainWindow)
         self.actionExit.setObjectName("actionExit")
         self.actionSettings = QtWidgets.QAction(MainWindow)
@@ -76,7 +81,6 @@ class Ui_MainWindow(object):
         self.actionNew_File.setObjectName("actionNew_File")
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionOpen)
-        self.menuFile.addAction(self.actionOpen_Recent)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
         self.menuTool.addAction(self.actionSettings)
@@ -95,13 +99,11 @@ class Ui_MainWindow(object):
         self.fileNew.setText(_translate("MainWindow", "New File"))
         self.openFile.setText(_translate("MainWindow", "Open File"))
         self.settings.setText(_translate("MainWindow", "Settings"))
-        self.openRecent.setText(_translate("MainWindow", "Open Recent"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuTool.setTitle(_translate("MainWindow", "Tools"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.actionNew.setText(_translate("MainWindow", "New"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
-        self.actionOpen_Recent.setText(_translate("MainWindow", "Open Recent"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionSettings.setText(_translate("MainWindow", "Settings"))
         self.actionCustimization.setText(_translate("MainWindow", "Customization"))
