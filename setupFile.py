@@ -150,7 +150,7 @@ class Ui_MainWindow2(object):
             if choice1:
                 with open('data.txt', 'a') as file:  # Use 'a' for appending
                     file.write(choice1)
-                    file.writelines('\n')  
+                    
 
 
         self.page_2 = QtWidgets.QWidget()
@@ -457,7 +457,7 @@ class Ui_MainWindow2(object):
                 print("Entertainment")
               
             if self.Check_Entertainment.isChecked():
-                choices.append("Check_Insurance")
+                choices.append("Insurance")
                 print("Insurance")  
             # Add more checkboxes as needed here
             

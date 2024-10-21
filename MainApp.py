@@ -23,7 +23,7 @@ class Ui_MainWindow3(object):
 
 
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
+        MainWindow.setObjectName("EasyFlow")
         MainWindow.resize(520, 960)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")

@@ -12,7 +12,7 @@ class Ui_MainWindow(object):
         self.window1.show()
 
     def openMainApp(self):
-        self.window3 = QtWidgets.QMainWindow
+        self.window3 = QtWidgets.QMainWindow()
         self.ui3 = Ui_MainWindow3()
         self.ui3.setupUi(self.window3)
         self.window3.show()
