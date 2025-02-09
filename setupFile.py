@@ -1,24 +1,21 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import csv
-from MainApp import Ui_MainWindow3
 import time
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QFileDialog
+import sqlite3
+from db_handler import DatabaseHandler
+import hashlib
+import re
 
 class Ui_MainWindow2(object):
 
     def __init__(self):
-        self.CancelPushed1 = False  
+        super().__init__()
         self.FinishPushed1 = False
-        choice1 = ""
-
-    def openMainApp(self):
-        self.window3 = QtWidgets.QMainWindow()
-        self.ui3 = Ui_MainWindow3()
-        self.ui3.setupUi(self.window3)
-        self.window3.show()
+        self.CancelPushed1 = False
+    
  
     def setupUi(self, MainWindow):
-        
-        
 
         MainWindow.setObjectName("SetupWindow")
         MainWindow.resize(1080, 720)
@@ -148,7 +145,7 @@ class Ui_MainWindow2(object):
                 print("family")
         
             if choice1:
-                with open('data.txt', 'a') as file:  # Use 'a' for appending
+                with open('tempData.txt', 'a') as file:  # Use 'a' for appending
                     file.write(choice1)
                     
 
@@ -312,15 +309,7 @@ class Ui_MainWindow2(object):
         font = QtGui.QFont()
         font.setPointSize(8)
         self.Q73.setFont(font)
-        self.Q73.setObjectName("Q73")
-
-        self.check_Income = QtWidgets.QCheckBox(self.page_3)
-        self.check_Income.setGeometry(QtCore.QRect(130, 71, 500, 51))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        self.check_Income.setFont(font)
-        self.check_Income.setTristate(False)
-        self.check_Income.setObjectName("check_Income")        
+        self.Q73.setObjectName("Q73")   
 
         self.IncomeLabel = QtWidgets.QLabel(self.page_3)
         self.IncomeLabel.setGeometry(QtCore.QRect(130, 105, 1000, 61))
@@ -356,13 +345,112 @@ class Ui_MainWindow2(object):
 
 
         def writeSalary(self):
-            # Ensure self is an instance of SomeClass
-            with open('data.txt  ', 'a') as file:
-                salary = self.salaryNum.text()
-                period = self.salaryPeriod.currentText()
-                file.write(",")
-                file.write(salary)
-                file.write(period)
+            salary = self.salaryNum.text()
+            period = self.salaryPeriod.currentText()
+            salary_info = f"{salary}{period}" if salary else ""
+
+            # Append salary to tempData.txt
+            if salary_info:
+                with open('tempData.txt', 'a') as file:  # Append mode
+                    file.write(f",{salary_info}")
+
+        def writeSalary(self):
+            salary2 = self.salaryNum.text()
+            period2 = self.salaryPeriod.currentText()
+            
+            if salary2:
+                try:
+                    salary2 = float(salary2)
+                    if period2 == "/year":
+                        monthly_salary = salary2 / 12  # Convert yearly salary to monthly
+                    else:
+                        monthly_salary = salary2  # Already monthly
+                    
+                    # Append monthly salary to tempData.txt
+                    with open('tempData.txt', 'a') as file:  # Append mode
+                        file.write(f",{monthly_salary:.2f}/month")
+                except ValueError:
+                    QMessageBox.warning(None, "Invalid Input", "Please enter a valid number for the salary.")
+                    return
+                
+        self.passwordLabel = QtWidgets.QLabel(self.page_3)
+        self.passwordLabel.setGeometry(QtCore.QRect(130, 230, 500, 30))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.passwordLabel.setFont(font)
+        self.passwordLabel.setObjectName("passwordLabel")
+        self.passwordLabel.setText("Type Password:")
+
+        self.passwordInput = QtWidgets.QLineEdit(self.page_3)
+        self.passwordInput.setGeometry(QtCore.QRect(130, 260, 260, 30))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.passwordInput.setFont(font)
+        self.passwordInput.setObjectName("passwordInput")
+        self.passwordInput.setEchoMode(QtWidgets.QLineEdit.Password)  # Hide input
+
+        self.confirmPasswordLabel = QtWidgets.QLabel(self.page_3)
+        self.confirmPasswordLabel.setGeometry(QtCore.QRect(130, 300, 500, 30))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.confirmPasswordLabel.setFont(font)
+        self.confirmPasswordLabel.setObjectName("confirmPasswordLabel")
+        self.confirmPasswordLabel.setText("Confirm Password:")
+
+        self.confirmPasswordInput = QtWidgets.QLineEdit(self.page_3)
+        self.confirmPasswordInput.setGeometry(QtCore.QRect(130, 330, 260, 30))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.confirmPasswordInput.setFont(font)
+        self.confirmPasswordInput.setObjectName("confirmPasswordInput")
+        self.confirmPasswordInput.setEchoMode(QtWidgets.QLineEdit.Password)
+
+        self.confirmPasswordButton = QtWidgets.QPushButton(self.page_3)
+        self.confirmPasswordButton.setGeometry(QtCore.QRect(130, 390, 200, 41))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.confirmPasswordButton.setFont(font)
+        self.confirmPasswordButton.setObjectName("confirmPasswordButton")
+        self.confirmPasswordButton.setText("Confirm Password")
+
+
+        def validate_password():
+            if not hasattr(self, 'passwordInput') or not hasattr(self, 'confirmPasswordInput'):
+                QMessageBox.warning(None, "Error", "Password fields are not initialized correctly.")
+                return
+
+            # Debugging Statements
+            print("DEBUG: Password input exists. Value:", self.passwordInput.text())
+            print("DEBUG: Confirm password input exists. Value:", self.confirmPasswordInput.text())
+
+            password = self.passwordInput.text()
+            confirm_password = self.confirmPasswordInput.text()
+
+            # Validation Logic (as before)
+            if len(password) < 6 or len(password) > 15:
+                QMessageBox.warning(None, "Invalid Password", "Password must be 6-15 characters long.")
+                return
+
+            if not re.search(r"[A-Z]", password):
+                QMessageBox.warning(None, "Invalid Password", "Password must contain at least one capital letter.")
+                return
+
+            if not re.search(r"\d", password):
+                QMessageBox.warning(None, "Invalid Password", "Password must contain at least one number.")
+                return
+
+            if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+                QMessageBox.warning(None, "Invalid Password", "Password must contain at least one special character.")
+                return
+
+            if password != confirm_password:
+                QMessageBox.warning(None, "Mismatch", "Passwords do not match.")
+                return
+
+            QMessageBox.information(None, "Success", "Password is valid and confirmed!")
+
+
+        self.confirmPasswordButton.clicked.connect(validate_password)
 
         font = QtGui.QFont()    
         font.setPointSize(21)
@@ -374,7 +462,6 @@ class Ui_MainWindow2(object):
         self.graphicsView_2.raise_()
         self.graphicsView.raise_()
         self.Page1Button.raise_()
-        self.Page3Button.raise_()
         self.Page2Button.raise_()
         self.FinishButton.raise_()
         self.CancelButton.raise_()
@@ -383,14 +470,14 @@ class Ui_MainWindow2(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         #pagebuttons
         def page1Click():
-            self.stackedWidget.setCurrentIndex(0)
-        def page2Click():
             self.stackedWidget.setCurrentIndex(1)
+        def page2Click():
+            self.stackedWidget.setCurrentIndex(2)
         def page3Click():
             self.stackedWidget.setCurrentIndex(2)        
 
@@ -459,45 +546,98 @@ class Ui_MainWindow2(object):
             if self.Check_Entertainment.isChecked():
                 choices.append("Insurance")
                 print("Insurance")  
-            # Add more checkboxes as needed here
-            
-            # Write the choices to a file if any checkboxes are selected
-            if choices:
-                # Read the existing content of the file
-                try:
-                    with open('data.txt', 'r') as file:
-                        content = file.read()
-                except FileNotFoundError:
-                    content = ''  # File does not exist, start with an empty content
-                
-                # Split the content by commas and strip any extra whitespace
-                items = [item.strip() for item in content.split(',') if item.strip()]
-
-                # Append the new choices to the existing items
-                items.extend(choices)
-
-                # Join the items back together with a comma and a space
-                new_content = ','.join(items)
-
-                # Write the updated content to the file
-                with open('data.txt', 'w') as file:
-                    file.write(new_content)
-
+            unique_choices = list(set(choices))  # Remove duplicates
+            with open('tempData.txt', 'w') as file:
+                file.write(','.join(unique_choices))  # Write unique categories
         
-
-
         def finishSetup():
-            if not self.FinishPushed1:  # Check if self.pushed2 is False
+            if not self.FinishPushed1:  # First confirmation
                 self.FinishButton.setText(QtCore.QCoreApplication.translate("MainWindow", "Confirm?"))
-                self.FinishPushed1 = True  # Set self.pushed2 to True after the first press
-            else:  # If self.pushed2 is True
-                record_choice(self)
+                self.FinishPushed1 = True
+                # Save categories and salary to tempData.txt
                 record_choice2(self)
                 writeSalary(self)
-                quit()  # Quit the application
-                 
-            
-        self.FinishButton.clicked.connect(finishSetup)  
+            else:  # Second confirmation
+                try:
+                    # Validate password
+                    password = self.passwordInput.text()
+                    confirm_password = self.confirmPasswordInput.text()
+
+                    if not password or not confirm_password:
+                        QMessageBox.warning(None, "Error", "Password fields cannot be empty.")
+                        return
+
+                    if password != confirm_password:
+                        QMessageBox.warning(None, "Error", "Passwords do not match.")
+                        return
+
+                    # Prompt user for database file name
+                    file_path, _ = QFileDialog.getSaveFileName(
+                        None,
+                        "Save Database As",
+                        "",
+                        "SQLite Database (*.db)"
+                    )
+
+                    if not file_path:
+                        QMessageBox.warning(None, "Cancelled", "No database file selected. Setup aborted.")
+                        return
+
+                    # Ensure the file has the correct extension
+                    if not file_path.endswith(".db"):
+                        file_path += ".db"
+
+                    # Initialize the database handler with the new file
+                    db = DatabaseHandler(db_file=file_path)
+
+                    # Process tempData.txt
+                    try:
+                        with open('tempData.txt', 'r') as temp_file:
+                            temp_data = temp_file.read().strip().split(',')
+                            print("DEBUG: Temp Data", temp_data)
+                    except FileNotFoundError:
+                        QMessageBox.warning(None, "Error", "Temporary data file not found.")
+                        return
+
+                    # Extract categories and salary
+                    categories = [item for item in temp_data if not item.endswith("/month") and not item.endswith("/year")]
+                    salary = [item for item in temp_data if item.endswith("/month") or item.endswith("/year")]
+
+                    if not categories:
+                        QMessageBox.warning(None, "Error", "No categories selected.")
+                        return
+
+                    monthly_salary = None
+                    for item in salary:
+                        if item.endswith("/month"):
+                            monthly_salary = float(item.replace("/month", ""))
+                            break
+
+                    if monthly_salary is None:
+                        QMessageBox.warning(None, "Error", "No valid salary found.")
+                        return
+
+                    # Save data to the database
+                    budget_id = db.add_budget("Default Budget", monthly_salary)  # Create budget and get ID
+                    db.set_password(password, budget_id=budget_id)  # Save hashed password for this budget
+                    db.add_categories(budget_id, categories)  # Add categories to the budget
+
+                    # Clear tempData.txt after saving
+                    with open('tempData.txt', 'w') as temp_file:
+                        temp_file.write("")  # Clears the file content
+
+                    # Confirm successful save
+                    QMessageBox.information(None, "Success", "Setup completed and saved!")
+                    quit()
+
+                except ValueError as e:
+                    QMessageBox.warning(None, "Error", str(e))  # Handle "Password already set"
+                except sqlite3.DatabaseError as e:
+                    QMessageBox.critical(None, "Database Error", f"SQLite Error: {str(e)}")
+                except Exception as e:
+                    QMessageBox.critical(None, "Database Error", f"Failed to complete setup: {str(e)}")
+
+        self.FinishButton.clicked.connect(finishSetup)
 
 
     def retranslateUi(self, MainWindow):
@@ -525,19 +665,18 @@ class Ui_MainWindow2(object):
         self.Check_Insurance.setText(_translate("MainWindow", "Insurance"))
         self.Check_Groceries.setText(_translate("MainWindow", "Groceries*"))
         self.Check_Travel.setText(_translate("MainWindow", "Travel"))
-        self.Question_7.setText(_translate("MainWindow", "NOTE: You will be able to change these after you have finished creating the budget"))
-        self.Q73.setText(_translate("MainWindow", "NOTE: You will be able to change these after you have finished creating the budget"))
+        self.Question_7.setText(_translate("MainWindow", "NOTE: You will NOT be able to change these after you have finished creating the budget"))
+        self.Q73.setText(_translate("MainWindow", "NOTE: You will NOT be able to change these after you have finished creating the budget"))
         self.Question_4.setText(_translate("MainWindow", "Please choose which categories you want to include:"))
-        self.label_3.setText(_translate("MainWindow", "2"))
-        self.QR3.setText(_translate("MainWindow", "3"))
-        self.Qu3.setText(_translate("MainWindow", "Please choose the remaining preferences:"))
+        self.label_3.setText(_translate("MainWindow", "1"))
+        self.QR3.setText(_translate("MainWindow", "2"))
+        self.Qu3.setText(_translate("MainWindow", "Please complete the remaining preferences:"))
         self.Check_Education.setText(_translate("MainWindow", "Education"))
         self.Check_Healthcare.setText(_translate("MainWindow", "Healthcare*"))
         self.Check_Clothing.setText(_translate("MainWindow", "Clothing"))
         self.Check_Savings.setText(_translate("MainWindow", "Savings"))
-        self.label.setText(_translate("MainWindow", "MY SETUP WIZARD"))
-        self.check_Income.setText(_translate("MainWindow", "Include Income?"))
-        self.IncomeLabel.setText(_translate("MainWindow", "If so, please enter value using of the periods below. Please only use numbers without commas."))
+        self.label.setText(_translate("MainWindow", "Budget Setup Wizard"))
+        self.IncomeLabel.setText(_translate("MainWindow", "Enter main source of income, often larger and fixed"))
         self.confirmSalary.setText(_translate("MainWindow", "Confirm"))
 
 
