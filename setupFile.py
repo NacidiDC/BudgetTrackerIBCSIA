@@ -628,6 +628,8 @@ class Ui_MainWindow2(object):
 
                     # Confirm successful save
                     QMessageBox.information(None, "Success", "Setup completed and saved!")
+                    app = QApplication.instance()  # Get the current application instance
+                    app.quit()
                     quit()
 
                 except ValueError as e:
